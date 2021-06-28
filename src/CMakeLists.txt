@@ -26,7 +26,7 @@ endforeach ()
 # )
 # ph_precompile (TARGET ph_concepts PRIVATE PCH ${std_pch} ${boost_pch})
 
-add_library (ph::network ALIAS ph_concepts)
+add_library (ph::network ALIAS ph_network)
 target_link_libraries (ph_network PRIVATE ${Boost_LIBRARIES})
 target_include_directories (ph_network PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories (ph_network PRIVATE ${Boost_INCLUDE_DIRS})
