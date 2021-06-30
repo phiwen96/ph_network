@@ -3,6 +3,39 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <arpa/inet.h>
+
+
+auto socket (addrinfo& a)
+{
+    return socket (a.ai_family, a.ai_socktype, a.ai_protocol);
+}
+
+auto to_string (addrinfo const& a )
+{
+    char* res = new char [INET6_ADDRSTRLEN];
+    
+    switch (a.ai_family)
+    {
+        case AF_INET:
+        {
+            auto* ip = (sockaddr_in*) a.ai_addr;
+            auto* addr = &ip -> sin_addr;
+            inet_ntop (AF_INET, addr, res, sizeof (char) * INET6_ADDRSTRLEN);
+            return res;
+        }
+            
+        case AF_INET6:
+        {
+            auto* ip = (sockaddr_in*) a.ai_addr;
+            auto* addr = &ip -> sin_addr;
+            inet_ntop (AF_INET6, addr, res, sizeof (char) * INET6_ADDRSTRLEN);
+            return res;
+        }
+    }
+}
+
+
 
 template <int>
 struct _IP_v;
