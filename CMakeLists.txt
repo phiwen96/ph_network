@@ -4,6 +4,7 @@ project(ph_network CXX)
 
 set (CMAKE_CXX_STANDARD 20)
 
+find_package (Boost 1.75 REQUIRED)
 
 
 

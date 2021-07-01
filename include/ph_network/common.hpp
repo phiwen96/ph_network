@@ -1,10 +1,13 @@
 #pragma once
 
 #include <type_traits>
+#include <boost/asio.hpp>
+
 
 #define fwd(x) std::forward <decltype (x)> (x)
 
-
+template <typename T, typename U>
+concept same_as = std::is_same_v <T, U>;
 
 template <typename T, typename U>
 concept convertible_to = std::is_convertible_v <T, U>;
@@ -56,3 +59,6 @@ concept String = string_type <T>::value or requires (T& A, T& B, int i)
 };
 
 
+
+template <typename T>
+concept Socket = same_as <T, boost::asio::ip::tcp::socket>;

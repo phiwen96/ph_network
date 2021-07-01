@@ -13,11 +13,7 @@ set (self ${PROJECT_NAME})
 set_target_properties (${self} PROPERTIES CXX_STANDARD 20)
 target_compile_features (${self} PUBLIC cxx_std_20)
 
-file (GLOB CONFIGS ${PROJECT_SOURCE_DIR}/src/in/*.hpp)
-foreach (file ${CONFIGS})
-	get_filename_component (name ${file} NAME)
-	configure_file (${file} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/${name} @ONLY)
-endforeach ()
+
 
 
 # add_custom_target(
@@ -27,9 +23,9 @@ endforeach ()
 # ph_precompile (TARGET ph_concepts PRIVATE PCH ${std_pch} ${boost_pch})
 
 add_library (ph::network ALIAS ph_network)
-target_link_libraries (ph_network PRIVATE ${Boost_LIBRARIES})
+target_link_libraries (ph_network PUBLIC ${Boost_LIBRARIES})
 target_include_directories (ph_network PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories (ph_network PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS})
 
 target_compile_features (ph_network PUBLIC cxx_std_20)
 

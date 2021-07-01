@@ -4,117 +4,15 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <boost/asio.hpp>
+#include "common.hpp"
 
-
-auto socket (addrinfo& a)
+auto write (Socket auto&& socket, String auto&& msg)
 {
-    return socket (a.ai_family, a.ai_socktype, a.ai_protocol);
-}
+    auto total_bytes_written = size_t {0};
 
-auto to_string (addrinfo const& a )
-{
-    char* res = new char [INET6_ADDRSTRLEN];
-    
-    switch (a.ai_family)
+    while (total_bytes_written != msg.length())
     {
-        case AF_INET:
-        {
-            auto* ip = (sockaddr_in*) a.ai_addr;
-            auto* addr = &ip -> sin_addr;
-            inet_ntop (AF_INET, addr, res, sizeof (char) * INET6_ADDRSTRLEN);
-            return res;
-        }
-            
-        case AF_INET6:
-        {
-            auto* ip = (sockaddr_in*) a.ai_addr;
-            auto* addr = &ip -> sin_addr;
-            inet_ntop (AF_INET6, addr, res, sizeof (char) * INET6_ADDRSTRLEN);
-            return res;
-        }
+        total_bytes_written += socket.write_some (buffer (msg.c_str() + total_bytes_written, msg.length() - total_bytes_written));
     }
-}
-
-
-
-template <int>
-struct _IP_v;
-
-template <>
-struct _IP_v <4>
-{
-    
-};
-
-
-template <>
-struct _IP_v <6>
-{
-    
-};
-
-
-template <int i>
-constexpr auto IP_v = _IP_v <i> {};
-
-
-template <typename = short>
-auto host_to_network_byte_order ();
-
-
-template <>
-auto host_to_network_byte_order <short> ()
-{
-    
-}
-
-template <>
-auto host_to_network_byte_order <long> ()
-{
-    
-}
-
-template <typename = short>
-auto network_to_host_byte_order ();
-
-
-template <>
-auto network_to_host_byte_order <short> ()
-{
-    
-}
-
-template <>
-auto network_to_host_byte_order <long> ()
-{
-    
-}
-
-
-
-template <int I>
-auto create_socket (auto&& domain, auto&& type, auto&& protocol)
-{
-    
-}
-
-/// associates a socket with a socket address structure,
-/// i.e a specified local port number and ip address.
-auto bind_to_port (auto&& socket, auto&& port/**/)
-{
-    
-}
-
-/// causes a bound tcp socket to enter listening mode.
-auto listen ()
-{
-    
-}
-
-/// accepts a received incoming attempt to create a new tcp connection
-/// from the remote client. and creates a new socket associated with the
-/// socket address pair of this connection.
-auto accept ()
-{
-    
 }
