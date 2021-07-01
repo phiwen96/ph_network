@@ -13,6 +13,6 @@ auto write (Socket auto&& socket, String auto&& msg)
 
     while (total_bytes_written != msg.length())
     {
-        total_bytes_written += socket.write_some (buffer (msg.c_str() + total_bytes_written, msg.length() - total_bytes_written));
+        total_bytes_written += socket.write_some (boost::asio::buffer (msg.c_str() + total_bytes_written, msg.length() - total_bytes_written));
     }
 }
