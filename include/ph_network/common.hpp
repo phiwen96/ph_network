@@ -2,6 +2,9 @@
 
 #include <type_traits>
 
+#define fwd(x) std::forward <decltype (x)> (x)
+
+
 
 template <typename T, typename U>
 concept convertible_to = std::is_convertible_v <T, U>;
