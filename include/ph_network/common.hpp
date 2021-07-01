@@ -3,6 +3,10 @@
 #include <type_traits>
 
 
+template <typename T, typename U>
+concept convertible_to = std::is_convertible_v <T, U>;
+
+
 template<typename T>
 struct string_type : std::false_type
 {
@@ -34,8 +38,7 @@ struct string_type <T*> : std::true_type // partial specialization for pointers
 };
 
 
-template <typename T, typename U>
-concept convertible_to = std::is_convertible_v <T, U>;
+
 
 template <typename T>
 concept Number = std::is_integral_v <T>;
@@ -48,3 +51,5 @@ concept String = string_type <T>::value or requires (T& A, T& B, int i)
     {A.size ()} -> convertible_to <std::size_t>;
     true;
 };
+
+
