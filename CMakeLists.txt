@@ -6,6 +6,7 @@ set (CMAKE_CXX_STANDARD 20)
 
 find_package (Boost 1.75 REQUIRED)
 
-
+add_subdirectory(cmake/phake)
 
 add_subdirectory(src)
+add_subdirectory(tests)
