@@ -142,27 +142,8 @@ auto hash_function (auto&& password, Nonce auto&&)
     return password;
 }
 
-
-TEST_CASE ("Server")
+auto server = [](char const* port)
 {
-//    auto a = stri <"hej">;
-    
-//    auto a = "
-//    auto aa = "hej"_transport_layer;
-//    cout << aa << endl;
-//    auto aa = "hej"_hej;
-//    auto a = ph::network::internet_protocol {"hej", "hej", "hej", "hej"};
-//    auto a = ph::network::internet_protocol {.application_layer = "hej", .transport_layer = "hej", .internet_layer = "hej", .link_layer = "hej"};
-
-//    cout <<
-
-//    return;
-//    std::cout << "yoyoyo" << std::endl;
-//    auto addresses = std::vector <char const*> {};
-//    ph::network::toIpAddresses ("google.com", addresses);
-//    cout << addresses << endl;
-//    return;
-    
     addrinfo* res;
     
     auto hints = addrinfo
@@ -172,7 +153,7 @@ TEST_CASE ("Server")
         .ai_flags = AI_PASSIVE
     };
     
-    if (auto err = getaddrinfo (nullptr, "80", &hints, &res); err != 0)
+    if (auto err = getaddrinfo (nullptr, port, &hints, &res); err != 0)
     {
         
         fprintf (stderr, "getaddrinfo error: %s\n", gai_strerror (err));
@@ -239,6 +220,11 @@ TEST_CASE ("Server")
 //    auto addr_size = sizeof their_addr;
     
     freeaddrinfo (res);
+};
+
+TEST_CASE ("Server")
+{
+    server (/*port*/"80");
 }
 
 TEST_CASE ("Client")
