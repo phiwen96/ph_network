@@ -34,13 +34,13 @@ struct string_type <T (&) [SZ]> : std::true_type// partial spec. for references 
 template <typename T>
 struct string_type <T (&) []> : std::true_type // partial spec. for references to arrays of unknown bounds
 {
-
+    
 };
 
 template <typename T>
 struct string_type <T*> : std::true_type // partial specialization for pointers
 {
-
+    
 };
 
 
@@ -53,7 +53,7 @@ template <typename T>
 concept String = string_type <T>::value or requires (T& A, T& B, int i)
 {
     {A [i]} -> convertible_to <char&>;
-//    {B [i]} -> convertible_to <char>;
+    //    {B [i]} -> convertible_to <char>;
     {A.size ()} -> convertible_to <std::size_t>;
     true;
 };
@@ -62,3 +62,29 @@ concept String = string_type <T>::value or requires (T& A, T& B, int i)
 
 template <typename T>
 concept Socket = same_as <T, boost::asio::ip::tcp::socket>;
+
+
+
+char* readFile(const char* path) {
+    FILE* file = fopen(path, "rb");
+    
+    if (file == NULL) {
+        fprintf(stderr, "Could not open file \"%s\".\n", path);
+        exit(74);
+    }
+    
+    fseek(file, 0L, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
+    
+    char* buffer = (char*)malloc(fileSize + 1);
+    if (buffer == NULL) {
+        fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
+        exit(74);
+    }
+    size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+    buffer[bytesRead] = '\0';
+    
+    fclose(file);
+    return buffer;
+}

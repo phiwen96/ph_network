@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <boost/asio.hpp>
 #include "common.hpp"
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 auto write (Socket auto&& socket, String auto&& msg)
 {

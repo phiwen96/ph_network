@@ -23,10 +23,10 @@ target_compile_features (${self} PUBLIC cxx_std_20)
 # ph_precompile (TARGET ph_concepts PRIVATE PCH ${std_pch} ${boost_pch})
 
 add_library (ph::network ALIAS ph_network)
-target_link_libraries (ph_network PUBLIC ${Boost_LIBRARIES})
+target_link_libraries (ph_network PUBLIC ${Boost_LIBRARIES} OpenSSL::SSL)
 target_include_directories (ph_network PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS})
-
+target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS} OpenSSL::SSL)
+#  OpenSSL::SSL
 target_compile_features (ph_network PUBLIC cxx_std_20)
 
 target_compile_options(ph_network PUBLIC "-ast-dump  -fsyntax-only")
