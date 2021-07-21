@@ -39,10 +39,12 @@ auto server = [](char const* address = nullptr, char const* port = "8080")
     
     auto hints = addrinfo
     {
-        .ai_family = AF_UNSPEC,
-        .ai_socktype = SOCK_STREAM,
-        .ai_flags = AI_PASSIVE
+        
     };
+
+    hints.ai_family = AF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_flags = AI_PASSIVE;
     
     if (auto err = getaddrinfo (nullptr, port, &hints, &servinfo); err != 0)
     {
@@ -59,11 +61,11 @@ auto server = [](char const* address = nullptr, char const* port = "8080")
         [&]()
         {
             void *addr;
-            char *ipver;
+            auto ipver = "IPv4";;
             
             if (p->ai_family == AF_INET) { // IPv4
                 struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr; addr = &(ipv4->sin_addr);
-                ipver = "IPv4";
+                
             } else { // IPv6
                 struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr; addr = &(ipv6->sin6_addr);
                 ipver = "IPv6";
@@ -318,47 +320,47 @@ auto main (int argc, char* argv[]) -> int
     //        }
     //    }(nullptr, "8080");
         server (nullptr, /*port*/"8080");
-    []{
-        int sock = socket (PF_INET, SOCK_DGRAM, 0);
+//     []{
+//         int sock = socket (PF_INET, SOCK_DGRAM, 0);
         
-        auto loopback = sockaddr_in
-        {
-            .sin_family = AF_INET,
-            .sin_addr.s_addr = 1337,   // can be any IP address
-            .sin_port = htons(9)      // using debug port
-        };
+//         auto loopback = sockaddr_in
+//         {
+//             .sin_family = AF_INET,
+//             .sin_addr.s_addr = 1337,   // can be any IP address
+//             .sin_port = htons(9)      // using debug port
+//         };
         
-        if (sock == -1) {
-            std::cerr << "Could not socket\n";
-            return 1;
-        }
+//         if (sock == -1) {
+//             std::cerr << "Could not socket\n";
+//             return 1;
+//         }
         
-//        std::memset(&loopback, 0, sizeof(loopback));
+// //        std::memset(&loopback, 0, sizeof(loopback));
         
         
-        if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
-            close(sock);
-            std::cerr << "Could not connect\n";
-            return 1;
-        }
+//         if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+//             close(sock);
+//             std::cerr << "Could not connect\n";
+//             return 1;
+//         }
         
-        socklen_t addrlen = sizeof(loopback);
-        if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
-            close(sock);
-            std::cerr << "Could not getsockname\n";
-            return 1;
-        }
+//         socklen_t addrlen = sizeof(loopback);
+//         if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+//             close(sock);
+//             std::cerr << "Could not getsockname\n";
+//             return 1;
+//         }
         
-        close(sock);
+//         close(sock);
         
-        char buf[INET_ADDRSTRLEN];
-        if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0) {
-            std::cerr << "Could not inet_ntop\n";
-            return 1;
-        } else {
-            std::cout << "Local ip address: " << buf << "\n";
-        }
-    };
+//         char buf[INET_ADDRSTRLEN];
+//         if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0) {
+//             std::cerr << "Could not inet_ntop\n";
+//             return 1;
+//         } else {
+//             std::cout << "Local ip address: " << buf << "\n";
+//         }
+//     };
     return 0;
     
     //    const auto p1 = std::chrono::system_clock::now();

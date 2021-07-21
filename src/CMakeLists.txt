@@ -29,7 +29,7 @@ target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS} OpenSSL::SSL
 #  OpenSSL::SSL
 target_compile_features (ph_network PUBLIC cxx_std_20)
 
-target_compile_options(ph_network PUBLIC "-ast-dump  -fsyntax-only")
+# target_compile_options(ph_network PUBLIC "-ast-dump  -fsyntax-only")
 
 
 target_include_directories(ph_network PRIVATE

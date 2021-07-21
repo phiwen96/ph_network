@@ -15,7 +15,7 @@ namespace ph::network
     auto test_0 = []()
     {
         auto error_code = boost::system::error_code {};
-        auto context = boost::
+      //   auto context = boost::
     };
 }
 
