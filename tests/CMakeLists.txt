@@ -1,7 +1,7 @@
 # Testing library
 set (${self} test_${PROJECT_NAME})
 # ph_fetch (catch2)
-find_package(Catch2 REQUIRED)
+# find_package(Catch2 REQUIRED)
 
 file(GLOB_RECURSE HEADER_LIST "include/*.hpp")
 file(GLOB SOURCE_LIST *.cpp)
