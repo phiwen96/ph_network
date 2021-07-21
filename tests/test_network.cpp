@@ -1,4 +1,10 @@
-////#include <catch2/catch.hpp>
+#include <catch2/catch.hpp>
+
+#ifdef _WIN32
+    #define _WIN32_WINNT 0x0A00
+#endif
+
+#include <boost/asio.hpp>
 //#include <ph_network/network.hpp>
 //#include <thread>
 //using namespace std::literals::string_literals;
@@ -12,7 +18,7 @@
 //        os << i << " ";
 //    }
 //    os << "}";
-//    
+//
 //    return os;
 //}
 //
@@ -25,7 +31,7 @@
 //        os << i << " ";
 //    }
 //    os << "}";
-//    
+//
 //    return os;
 //}
 //
@@ -51,9 +57,9 @@
 //auto process (auto builder) -> PROCESS
 //{
 ////    auto p = fork ();
-//    
 //
-//    
+//
+//
 //}
 //
 //using std::cout;
@@ -76,7 +82,7 @@
 //template <auto...>
 //struct layer
 //{
-//    
+//
 //};
 //
 //consteval auto operator "" _transport_layer (char const* str, std::size_t n)
@@ -119,23 +125,23 @@
 //
 //auto send (Node auto from, Node auto to)
 //{
-//    
+//
 //}
 //
 //auto contact (Node auto from, Node auto to)
 //{
-//    
+//
 //}
 //
 //
 //auto challange (auto from, auto to) -> Nonce auto
 //{
-//    
+//
 //}
 //
 //auto respond (Hash auto, Node auto from, Node auto challanger)
 //{
-//    
+//
 //}
 //
 //auto hash_function (auto&& password, Nonce auto&&)
@@ -144,3 +150,22 @@
 //}
 //
 //
+
+
+
+TEST_CASE("boost::asio example 0")
+{
+    using namespace std;
+    cout << "hi" << endl;
+    
+    auto error_code = boost::system::error_code {};
+    auto context = boost::asio::io_context {};
+    auto endpoint = boost::asio::ip::tcp::endpoint {boost::asio::ip::make_address ("93.184.216.34", error_code), 80};
+    auto socket = boost::asio::ip::tcp::socket {context};
+    
+    socket.connect (endpoint, error_code);
+    
+    REQUIRE (not error_code);
+
+    
+}
