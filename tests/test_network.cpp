@@ -35,5 +35,5 @@ TEST_CASE("asio, connect to address and write string")
 
 TEST_CASE ("main")
 {
-   
+    signed int a;
 }
