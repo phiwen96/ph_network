@@ -19,3 +19,44 @@ if (NOT TARGET ph_system)
 endif ()
 add_subdirectory(src)
 add_subdirectory(tests)
+
+
+
+function(Kiss)
+	set(prefix ARG)
+	set(NoValues Ja Nej)
+	set(SingleValues Okej)
+	set(MultiValues Lol Nope) 
+	cmake_parse_arguments(${prefix} "${NoValues}" "${SingleValues}" "${MultiValues}" ${ARGN})
+	if(ARG_Ja)
+		message("lol")
+	endif()
+	
+	foreach (noValue IN LISTS NoValues)
+				# message ("${noValue}")
+
+		if (${${prefix}_${noValue}})
+			# message ("${noValue}")
+		endif ()
+	endforeach ()
+	
+endfunction(Kiss)
+
+
+Kiss (Ja)
+
+
+function(Bajs)
+	set(prefix ARG)
+	set(NoValues Ja Nej)
+	set(SingleValues Ok)
+	set(MultiValues Lol)
+	cmake_parse_arguments(${prefix} "${NoValues}" "${SingleValues}" "{MultiValues}" ${ARGN})
+	foreach(NoValue in LISTS NoValues)
+		if(${${prefix}_${NoValue}})
+			
+		endif()
+		
+	endforeach()
+	
+endfunction(Bajs)
