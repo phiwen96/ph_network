@@ -31,3 +31,9 @@ TEST_CASE("asio, connect to address and write string")
     socket.write_some (boost::asio::buffer (text, strlen (text)), error_code);
     
 }
+
+
+TEST_CASE ("main")
+{
+   
+}

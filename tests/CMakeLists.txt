@@ -26,7 +26,6 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 else()
     set_target_properties(test_${PROJECT_NAME}           PROPERTIES FOLDER "dependencies/${PROJECT_NAME}")
 endif()
-message("$<TARGET_FILE:test_${PROJECT_NAME}>")
 # add_custom_target(
 #   GenexDemo
 #   COMMAND ${CMAKE_COMMAND} -E echo "$<TARGET_FILE:test_${PROJECT_NAME}>"

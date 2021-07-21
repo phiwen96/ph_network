@@ -22,41 +22,61 @@ add_subdirectory(tests)
 
 
 
-function(Kiss)
-	set(prefix ARG)
-	set(NoValues Ja Nej)
-	set(SingleValues Okej)
-	set(MultiValues Lol Nope) 
-	cmake_parse_arguments(${prefix} "${NoValues}" "${SingleValues}" "${MultiValues}" ${ARGN})
-	if(ARG_Ja)
-		message("lol")
-	endif()
-	
-	foreach (noValue IN LISTS NoValues)
-				# message ("${noValue}")
 
-		if (${${prefix}_${noValue}})
-			# message ("${noValue}")
-		endif ()
+function (ph_build_library)
+
+	set (prefix ARG)
+	set (NoValues SNOPP)
+	set (SingleValus NAME INCLUDE_DST SRC_DST)
+	set (MultiValues MODULES BAJS)
+
+	cmake_parse_arguments (${prefix} "${NoValues}" "${SingleValues}" "${MultiValues}" ${ARGN})
+
+	if (ARG_NAME)
+		# message (${ARG_NAME})
+	endif ()
+
+	if (ARG_INCLUDE_DST)
+		# message (${ARG_INCLUDE_DST})
+	endif ()
+
+	if (ARG_SRC_DST)
+		# message (${ARG_SRC_DST})
+	endif ()
+
+	if (ARG_MODULES)
+		foreach (value IN LISTS ARG_MODULES)
+			# message("kiss ${value}")
+		endforeach ()
+	endif ()
+	
+	foreach (type IN LISTS MultiValues)
+		if (${prefix}_${type})
+			foreach(value IN LISTS ${prefix}_${type})
+				# message("${value}")
+			endforeach()
+		endif()
 	endforeach ()
 	
-endfunction(Kiss)
+endfunction ()
 
 
-Kiss (Ja)
 
 
-function(Bajs)
-	set(prefix ARG)
-	set(NoValues Ja Nej)
-	set(SingleValues Ok)
-	set(MultiValues Lol)
-	cmake_parse_arguments(${prefix} "${NoValues}" "${SingleValues}" "{MultiValues}" ${ARGN})
-	foreach(NoValue in LISTS NoValues)
-		if(${${prefix}_${NoValue}})
-			
-		endif()
-		
-	endforeach()
-	
-endfunction(Bajs)
+ph_build_library (
+	NAME 
+		"pp_network" 
+
+	MODULES 
+		"Floating"
+		"Integer"
+		"Number" 
+		"Range" 
+		"String"
+
+	INCLUDE_DST 
+		"${CMAKE_CURRENT_LIST_DIR}/include/pp_network"
+
+	SRC_DST
+		"${CMAKE_CURRENT_LIST_DIR}/src"
+)
