@@ -26,8 +26,8 @@ add_subdirectory(tests)
 function (ph_build_library)
 
 	set (prefix ARG)
-	set (NoValues SNOPP)
-	set (SingleValus NAME INCLUDE_DST SRC_DST)
+	set (NoValues DONT_ERASE_MODULE_IF_NOT_DEFINED)
+	set (SingleValues NAME INCLUDE SRC)
 	set (MultiValues MODULES BAJS)
 
 	cmake_parse_arguments (${prefix} "${NoValues}" "${SingleValues}" "${MultiValues}" ${ARGN})
@@ -36,27 +36,60 @@ function (ph_build_library)
 		# message (${ARG_NAME})
 	endif ()
 
-	if (ARG_INCLUDE_DST)
-		# message (${ARG_INCLUDE_DST})
+	if (ARG_INCLUDE AND ARG_SRC)
+		message (${ARG_INCLUDE})
 	endif ()
 
-	if (ARG_SRC_DST)
-		# message (${ARG_SRC_DST})
+	# foreach (single_value IN LISTS SingleVal)
+		
+	# endforeach ()
+	
+
+	if (ARG_SRC)
+		message (${ARG_SRC})
 	endif ()
 
 	if (ARG_MODULES)
-		foreach (value IN LISTS ARG_MODULES)
-			# message("kiss ${value}")
+		foreach (module_name IN LISTS ARG_MODULES)
+			set (header_file "${ARG_INCLUDE}/${module_name}.hpp")
+			set (source_file "${ARG_SRC}/${module_name}.cpp")
+			if (EXISTS ${header_file})
+				# message("${header_file} already exists.")
+			else ()
+				message("creating ${header_file}")
+				file (WRITE "${header_file}" "#pragma once")
+			endif ()
+			if (EXISTS ${source_file})
+				# message("${source_file} already exists.")
+			else ()
+				message("creating ${header_file}")
+				file (WRITE "${source_file}" "#include \"${module_name}\"")
+			endif ()
 		endforeach ()
 	endif ()
+
+	if (NOT DONT_ERASE_MODULE_IF_NOT_DEFINED)
+		file (GLOB include "${ARG_INCLUDE}/*.hpp")
+		file (GLOB src "${ARG_SRC}/*.cpp")
+
+	# else ()
+		foreach (file ${include})
+			list (FIND ARG_MODULES "${file}" _index)
+			if (${_index} GREATER -1)
+				message("maybe delete ${file}?")
+			endif()
+			# if (${file} IN LISTS ARG_MODULES)
+				# message("maybe delete ${file}=")
+			# endif ()
+			
+			# message("jj ${file}")
+		endforeach ()
+		
+		
+	endif ()
 	
-	foreach (type IN LISTS MultiValues)
-		if (${prefix}_${type})
-			foreach(value IN LISTS ${prefix}_${type})
-				# message("${value}")
-			endforeach()
-		endif()
-	endforeach ()
+	
+
 	
 endfunction ()
 
@@ -73,10 +106,16 @@ ph_build_library (
 		"Number" 
 		"Range" 
 		"String"
+		# "Bajs"
 
-	INCLUDE_DST 
+	INCLUDE
 		"${CMAKE_CURRENT_LIST_DIR}/include/pp_network"
 
-	SRC_DST
+	SRC
 		"${CMAKE_CURRENT_LIST_DIR}/src"
 )
+
+
+
+
+# cmake -Wno-dev -DCMAKE_CONFIGURATION_TYPES="Debug;Release;Kuk" -DCMAKE_CXX_COMPILER=/Applications/Xcode.app/Contents/Developer/usr/bin/g++ -S . -B xbuild -GXcode && cmake --open xbuild
