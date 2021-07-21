@@ -1,3 +1,5 @@
+#include <ph_concepts/concepts.hpp>
+
 #include <catch2/catch.hpp>
 
 #ifdef _WIN32
@@ -5,6 +7,8 @@
 #endif
 
 #include <boost/asio.hpp>
+
+
 //#include <ph_network/network.hpp>
 //#include <thread>
 //using namespace std::literals::string_literals;
@@ -153,7 +157,7 @@
 
 
 
-TEST_CASE("boost::asio example 0")
+TEST_CASE("asio, connect to address and write string")
 {
     using namespace std;
     cout << "hi" << endl;
@@ -165,7 +169,14 @@ TEST_CASE("boost::asio example 0")
     
     socket.connect (endpoint, error_code);
     
-    REQUIRE (not error_code);
+    REQUIRE_FALSE (error_code);
+    REQUIRE (socket.is_open ());
+    
+    auto text = "GET /index.html HTTP/1.1\r\n"
+                "Host: example.com\r\n"
+                "Connection: close\r\n\r\n";
 
+    
+    socket.write_some (boost::asio::buffer (text, strlen (text)), error_code);
     
 }
