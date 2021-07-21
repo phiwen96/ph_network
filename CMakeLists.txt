@@ -23,93 +23,17 @@ add_subdirectory(tests)
 
 
 
-function (ph_build_library)
-
-	set (prefix ARG)
-	set (NoValues DONT_ERASE_MODULE_IF_NOT_DEFINED)
-	set (SingleValues NAME INCLUDE SRC)
-	set (MultiValues MODULES BAJS)
-
-	cmake_parse_arguments (${prefix} "${NoValues}" "${SingleValues}" "${MultiValues}" ${ARGN})
-
-	if (ARG_NAME)
-		# message (${ARG_NAME})
-	endif ()
-
-	if (ARG_INCLUDE AND ARG_SRC)
-		message (${ARG_INCLUDE})
-	endif ()
-
-	# foreach (single_value IN LISTS SingleVal)
-		
-	# endforeach ()
-	
-
-	if (ARG_SRC)
-		message (${ARG_SRC})
-	endif ()
-
-	if (ARG_MODULES)
-		foreach (module_name IN LISTS ARG_MODULES)
-			set (header_file "${ARG_INCLUDE}/${module_name}.hpp")
-			set (source_file "${ARG_SRC}/${module_name}.cpp")
-			if (EXISTS ${header_file})
-				# message("${header_file} already exists.")
-			else ()
-				message("creating ${header_file}")
-				file (WRITE "${header_file}" "#pragma once")
-			endif ()
-			if (EXISTS ${source_file})
-				# message("${source_file} already exists.")
-			else ()
-				message("creating ${header_file}")
-				file (WRITE "${source_file}" "#include \"${module_name}\"")
-			endif ()
-		endforeach ()
-	endif ()
-
-	if (NOT DONT_ERASE_MODULE_IF_NOT_DEFINED)
-		file (GLOB include "${ARG_INCLUDE}/*.hpp")
-		file (GLOB src "${ARG_SRC}/*.cpp")
-
-	# else ()
-		foreach (file ${include})
-			list (FIND ARG_MODULES "${file}" _index)
-			if (${_index} GREATER -1)
-				message("maybe delete ${file}?")
-			endif()
-			# if (${file} IN LISTS ARG_MODULES)
-				# message("maybe delete ${file}=")
-			# endif ()
-			
-			# message("jj ${file}")
-		endforeach ()
-		
-		
-	endif ()
-	
-	
-
-	
-endfunction ()
 
 
 
-
-ph_build_library (
-	NAME 
-		"pp_network" 
+ph_create_modules (
 
 	MODULES 
-		"Floating"
-		"Integer"
-		"Number" 
-		"Range" 
-		"String"
-		# "Bajs"
+		"network"
+		"common"
 
 	INCLUDE
-		"${CMAKE_CURRENT_LIST_DIR}/include/pp_network"
+		"${CMAKE_CURRENT_LIST_DIR}/include/ph_network"
 
 	SRC
 		"${CMAKE_CURRENT_LIST_DIR}/src"
@@ -119,3 +43,4 @@ ph_build_library (
 
 
 # cmake -Wno-dev -DCMAKE_CONFIGURATION_TYPES="Debug;Release;Kuk" -DCMAKE_CXX_COMPILER=/Applications/Xcode.app/Contents/Developer/usr/bin/g++ -S . -B xbuild -GXcode && cmake --open xbuild
+# cmake -Wno-dev -DCMAKE_CONFIGURATION_TYPES="Debug;Release;Kuk" -DCMAKE_CXX_COMPILER=/Applications/Xcode.app/Contents/Developer/usr/bin/g++ -S . -B xbuild -GXcode
