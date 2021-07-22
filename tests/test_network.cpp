@@ -1,5 +1,5 @@
 #include "test_network.hpp"
-
+#include <ph_data_structures/stack.hpp>
 
 
 
@@ -176,7 +176,7 @@ TEST_CASE ("virtual machine")
         opcode::MULTIPLY
     };
     
-    auto data = ph::stack
+    auto data = ph::data_structures::stack
     {
         1,
         -70
