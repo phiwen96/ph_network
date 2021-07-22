@@ -162,11 +162,20 @@ struct virtual_machine
 
 namespace ph
 {
-    struct ph_stack
+    template <typename T, size_t N>
+    struct stack
     {
+        T _data [N];
         
+        size_t curr {0};
     };
+    
+    template <typename T, typename... U>
+    stack (T, U...) -> stack <std::common_type_t <T, U...>, sizeof... (U) + 1>;
 }
+
+
+
 
 
 
@@ -177,7 +186,7 @@ TEST_CASE ("virtual machine")
         opcode::MULTIPLY
     };
     
-    auto data =
+    auto data = ph::stack
     {
         1,
         -70
@@ -185,7 +194,7 @@ TEST_CASE ("virtual machine")
     
     auto vm = virtual_machine {};
     
-    vm.run ({opcode::MULTIPLY}, {1, -70});
+//    vm.run ({opcode::MULTIPLY}, {1, -70});
     
     
     
