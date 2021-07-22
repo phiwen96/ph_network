@@ -7,3 +7,6 @@
 [submodule "dependencies/ph_system"]
 	path = dependencies/ph_system
 	url = https://github.com/phiwen96/ph_system
+[submodule "dependencies/ph_data_structures"]
+	path = dependencies/ph_data_structures
+	url = https://github.com/phiwen96/ph_data_structures
