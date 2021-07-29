@@ -5,10 +5,10 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	set (CMAKE_CXX_STANDARD_REQUIRED ON)
 	set (CMAKE_CXX_EXTENSIONS ON)
 	set_property (GLOBAL PROPERTY USE_FOLDERS ON)
-	find_package (Boost 1.74 REQUIRED)
 	# find_package(OpenSSL REQUIRED)
 endif()
-if (NOT TARGET ph_cmake)
+
+# if (NOT TARGET ph_cmake)
 	include (FetchContent)
 	FetchContent_Declare(
   		ph_cmake
@@ -21,7 +21,7 @@ if (NOT TARGET ph_cmake)
   		FetchContent_Populate (ph_cmake)
   		add_subdirectory (${ph_cmake_SOURCE_DIR} ${ph_cmake_BINARY_DIR})
 	endif ()
-endif ()
+# endif ()
 
 ph_fetch_git_repos (USER "phiwen96" REPOS "ph_concepts" "ph_system")
 
