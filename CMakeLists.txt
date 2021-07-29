@@ -23,17 +23,7 @@ if (NOT TARGET ph_cmake)
 	endif ()
 endif ()
 
-ph_fetch (USER "phiwen96" REPOS "ph_concepts" "ph_system")
-
-
-
-
-
-
-
-
-
-
+ph_fetch_git_repos (USER "phiwen96" REPOS "ph_concepts" "ph_system")
 
 ph_create_modules (
 
