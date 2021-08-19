@@ -8,7 +8,7 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	# find_package(OpenSSL REQUIRED)
 endif()
 
-# if (NOT TARGET ph_cmake)
+if (NOT TARGET ph_cmake)
 	include (FetchContent)
 	FetchContent_Declare(
   		ph_cmake
@@ -21,22 +21,26 @@ endif()
   		FetchContent_Populate (ph_cmake)
   		add_subdirectory (${ph_cmake_SOURCE_DIR} ${ph_cmake_BINARY_DIR})
 	endif ()
-# endif ()
+endif ()
 
-ph_fetch_git_repos (USER "phiwen96" REPOS "ph_concepts" "ph_system")
 
-ph_create_modules (
 
-	MODULES 
-		"network"
-		"common"
 
-	INCLUDE
-		"${CMAKE_CURRENT_LIST_DIR}/include/ph_network"
 
-	SRC
-		"${CMAKE_CURRENT_LIST_DIR}/src"
-)
+# ph_fetch_git_repos (USER "phiwen96" REPOS "ph_concepts" "ph_system")
+
+# ph_create_modules (
+
+# 	MODULES 
+# 		"network"
+# 		"common"
+
+# 	INCLUDE
+# 		"${CMAKE_CURRENT_LIST_DIR}/include/ph_network"
+
+# 	SRC
+# 		"${CMAKE_CURRENT_LIST_DIR}/src"
+# )
 
 
 
