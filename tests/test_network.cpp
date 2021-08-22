@@ -13,24 +13,7 @@ namespace ph::network
         const auto te0 = [](auto ip_address, Signed auto port)
         {
             cout << "hi" << endl;
-            
-            auto error_code = boost::system::error_code {};
-            auto context = boost::asio::io_context {};
-            auto endpoint = boost::asio::ip::tcp::endpoint {boost::asio::ip::make_address (ip_address, error_code), static_cast<unsigned short>(port)};
-            auto socket = boost::asio::ip::tcp::socket {context};
-            
-            socket.connect (endpoint, error_code);
-            
-            REQUIRE_FALSE (error_code);
-            REQUIRE (socket.is_open ());
-            
-            auto text = "GET /index.html HTTP/1.1\r\n"
-                        "Host: example.com\r\n"
-                        "Connection: close\r\n\r\n";
-
-            
-            socket.write_some (boost::asio::buffer (text, strlen (text)), error_code);
-            
+           
         };
         
         

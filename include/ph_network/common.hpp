@@ -1,7 +1,9 @@
 #pragma once
 
 #include <type_traits>
-#include <boost/asio.hpp>
+#include <stdio.h>
+#include <memory>
+//#include <boost/asio.hpp>
 
 
 #define fwd(x) std::forward <decltype (x)> (x)
@@ -60,8 +62,8 @@ concept String = string_type <T>::value or requires (T& A, T& B, int i)
 
 
 
-template <typename T>
-concept Socket = same_as <T, boost::asio::ip::tcp::socket>;
+//template <typename T>
+//concept Socket = same_as <T, boost::asio::ip::tcp::socket>;
 
 
 
@@ -70,17 +72,17 @@ char* readFile(const char* path) {
     
     if (file == NULL) {
         fprintf(stderr, "Could not open file \"%s\".\n", path);
-        exit(74);
+//        std::exit(74);
     }
     
     fseek(file, 0L, SEEK_END);
     size_t fileSize = ftell(file);
     rewind(file);
     
-    char* buffer = (char*)malloc(fileSize + 1);
+    char* buffer = (char*)std::malloc(fileSize + 1);
     if (buffer == NULL) {
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
-        exit(74);
+//        exit(74);
     }
     size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
     buffer[bytesRead] = '\0';

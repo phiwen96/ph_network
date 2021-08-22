@@ -24,7 +24,7 @@ target_compile_features (${self} PUBLIC cxx_std_20)
 
 # add_library (ph::network ALIAS ph_network)
 target_link_libraries (ph_network PUBLIC ph_concepts ph_data_structures ${Boost_LIBRARIES})
-target_include_directories (ph_network PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories (ph_network PUBLIC ph_concepts ph_data_structures ${PROJECT_SOURCE_DIR}/include)
 # target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS})
 #  OpenSSL::SSL
 target_compile_features (ph_network PUBLIC cxx_std_20)
