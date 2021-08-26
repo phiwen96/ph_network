@@ -90,3 +90,28 @@ char* readFile(const char* path) {
     fclose(file);
     return buffer;
 }
+
+
+template <typename>
+auto host_to_nework ();
+
+template <>
+auto host_to_nework <short> (/*htons*/);
+
+template <>
+auto host_to_nework <long> (/*htonl*/);
+
+
+template <typename>
+auto network_to_host ();
+
+template <>
+auto network_to_host <short> (/*ntohs*/);
+
+template <>
+auto network_to_host <long> (/*ntohl*/);
+
+
+
+
+

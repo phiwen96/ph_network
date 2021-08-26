@@ -1,25 +1,48 @@
 #include "test_network.hpp"
-#include <ph_data_structures/stack.hpp>
+#include <poll.h>
+#include <ph_network/poll_server.hpp>
 
 
+using std::cout, std::endl;
 
 namespace ph::network
 {
+
+    
+    TEST_CASE ()
+    {
+        
+//        poll_server ();
+    };
+    
     TEST_CASE("asio, connect to address and write string")
     {
         using namespace std;
-
+        
         
         const auto te0 = [](auto ip_address, Signed auto port)
         {
             cout << "hi" << endl;
-           
+            
         };
         
         
         te0 ("93.184.216.34", 80);
         
         
+    }
+    
+    TEST_CASE ()
+    {
+        //        auto ctx = asio::io_context{};
+        //        auto timer = asio::system_timer{ctx};
+        //        timer.expires_from_now(1000ms);
+        //        timer.async_wait([](auto error) { // Callback
+        //        // Ignore errors..
+        //        std::cout << "Hello from delayed callback\n";
+        //        });
+        //        std::cout << "Hello from main\n";
+        //        ctx.run();
     }
 }
 
@@ -88,7 +111,7 @@ struct virtual_machine
             {
                 case opcode::MULTIPLY:
                 {
-                   
+                    
                     data.push (data.pop () * data.pop ());
                     
                     
@@ -154,21 +177,26 @@ struct virtual_machine
 
 TEST_CASE ("virtual machine")
 {
-    auto code =
-    {
-        opcode::MULTIPLY
-    };
     
-    auto data = ph::data_structures::stack
-    {
-        1,
-        -70
-    };
     
-    auto vm = virtual_machine {};
-    
-//    vm.run ({opcode::MULTIPLY}, {1, -70});
+    //    vm.run ({opcode::MULTIPLY}, {1, -70});
     
     
     
+}
+
+
+#include <unistd.h>
+#include <sys/wait.h>
+
+TEST_CASE("forking")
+{
+    cout << getpid() << endl;
+    int i = 0;
+    auto id = fork ();
+    
+    ++i;
+    cout << i << endl;
+    wait (NULL);
+//    cout << id << endl;
 }

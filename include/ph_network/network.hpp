@@ -8,7 +8,9 @@
 
 #include <iostream>
 #include <ph_concepts/concepts.hpp>
-
+#include <latch>
+//#include <asio
+//#include <boo
 //#include <sys/types.h>
 //#include <sys/socket.h>
 //#include <netdb.h>
@@ -19,15 +21,13 @@
 
 //#include <ph_concepts/concepts.hpp>
 
-
+//#include
+#include <poll.h>
 
 namespace ph::network
 {
     
-    auto test_0 = [](String auto address = "93.184.216.34", Signed auto port = 80)
-    {
-       
-    };
+    
 }
 
 
