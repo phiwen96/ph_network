@@ -6,59 +6,8 @@
 //#include <boost/asio.hpp>
 
 
+
 #define fwd(x) std::forward <decltype (x)> (x)
-
-template <typename T, typename U>
-concept same_as = std::is_same_v <T, U>;
-
-template <typename T, typename U>
-concept convertible_to = std::is_convertible_v <T, U>;
-
-
-template<typename T>
-struct string_type : std::false_type
-{
-    
-};
-
-template <typename T, size_t SZ>
-struct string_type <T [SZ]> : std::true_type// partial specialization for arrays of known bounds
-{
-    
-};
-
-template <typename T, size_t SZ>
-struct string_type <T (&) [SZ]> : std::true_type// partial spec. for references to arrays of known bounds
-{
-    
-};
-
-template <typename T>
-struct string_type <T (&) []> : std::true_type // partial spec. for references to arrays of unknown bounds
-{
-    
-};
-
-template <typename T>
-struct string_type <T*> : std::true_type // partial specialization for pointers
-{
-    
-};
-
-
-
-
-template <typename T>
-concept Number = std::is_integral_v <T>;
-
-template <typename T>
-concept String = string_type <T>::value or requires (T& A, T& B, int i)
-{
-    {A [i]} -> convertible_to <char&>;
-    //    {B [i]} -> convertible_to <char>;
-    {A.size ()} -> convertible_to <std::size_t>;
-    true;
-};
 
 
 
@@ -92,24 +41,7 @@ char* readFile(const char* path) {
 }
 
 
-template <typename>
-auto host_to_nework ();
 
-template <>
-auto host_to_nework <short> (/*htons*/);
-
-template <>
-auto host_to_nework <long> (/*htonl*/);
-
-
-template <typename>
-auto network_to_host ();
-
-template <>
-auto network_to_host <short> (/*ntohs*/);
-
-template <>
-auto network_to_host <long> (/*ntohl*/);
 
 
 

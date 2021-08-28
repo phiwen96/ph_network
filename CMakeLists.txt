@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.18)
-project(ph_network CXX)
+
+find_program (MEMORYCHECK_COMMAND valgrind)
+set (MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full")
+
+
+project (ph_network CXX)
+
+
+
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	# include (CTest)
 	set (CMAKE_CXX_STANDARD 20)
 	set (CMAKE_CXX_STANDARD_REQUIRED ON)
 	set (CMAKE_CXX_EXTENSIONS ON)
@@ -13,7 +22,7 @@ if (NOT TARGET ph_cmake)
 	FetchContent_Declare(
   		ph_cmake
   		GIT_REPOSITORY https://github.com/phiwen96/ph_cmake.git
-  		GIT_TAG        v0.0.0)
+  		GIT_TAG        0.0.0)
 
 	FetchContent_GetProperties(ph_cmake)
 	
@@ -27,7 +36,22 @@ endif ()
 
 
 
-Fetch (TARGETS ph_data_structures ph_concepts)
+Fetch (TARGETS ph_data_structures ph_concepts const_str)
+
+if (NOT TARGET ctre)
+	include (FetchContent)
+	FetchContent_Declare(
+  		ctre
+  		GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
+  		GIT_TAG        main)
+
+	FetchContent_GetProperties(ctre)
+	
+	if (NOT ctre_POPULATED)
+  		FetchContent_Populate (ctre)
+  		add_subdirectory (${ctre_SOURCE_DIR} ${ctre_BINARY_DIR})
+	endif ()
+endif ()
 
 
 find_package (Boost 1.76.0 REQUIRED COMPONENTS system)
