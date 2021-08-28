@@ -38,23 +38,23 @@ endif ()
 
 Fetch (TARGETS ph_data_structures ph_concepts const_str)
 
-if (NOT TARGET ctre)
-	include (FetchContent)
-	FetchContent_Declare(
-  		ctre
-  		GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
-  		GIT_TAG        main)
+# if (NOT TARGET ctre)
+# 	include (FetchContent)
+# 	FetchContent_Declare(
+#   		ctre
+#   		GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
+#   		GIT_TAG        main)
 
-	FetchContent_GetProperties(ctre)
+# 	FetchContent_GetProperties(ctre)
 	
-	if (NOT ctre_POPULATED)
-  		FetchContent_Populate (ctre)
-  		add_subdirectory (${ctre_SOURCE_DIR} ${ctre_BINARY_DIR})
-	endif ()
-endif ()
+# 	if (NOT ctre_POPULATED)
+#   		FetchContent_Populate (ctre)
+#   		add_subdirectory (${ctre_SOURCE_DIR} ${ctre_BINARY_DIR})
+# 	endif ()
+# endif ()
 
 
-find_package (Boost 1.76.0 REQUIRED COMPONENTS system)
+# find_package (Boost 1.76.0 REQUIRED COMPONENTS system)
 
 # ph_fetch_git_repos (USER "phiwen96" REPOS "ph_concepts" "ph_system")
 
