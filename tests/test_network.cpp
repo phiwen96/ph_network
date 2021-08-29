@@ -206,7 +206,7 @@ auto decode (auto number)
     
 }
 
-int sendall (int s, char* buf, int* len)
+int sendall (int s, char* buf, int *len)
 {
     
     int total = 0;
@@ -247,7 +247,9 @@ TEST_CASE ()
     auto pfds = std::vector <pollfd> {};
     
     listener = get_listener_socket();
-    if (listener == -1) {
+    
+    if (listener == -1)
+    {
         fprintf(stderr, "error getting listening socket\n"); exit(1);
     }
     // Add the listener to set
@@ -272,7 +274,8 @@ TEST_CASE ()
             // Check if someone's ready to read
             if (pfds[i].revents & POLLIN)
             { // We got one!!
-                if (pfds[i].fd == listener) {
+                if (pfds[i].fd == listener)
+                {
                     // If listener is ready to read, handle new connection
                     addrlen = sizeof remoteaddr;
                     newfd = accept (listener,(struct sockaddr *)&remoteaddr, &addrlen);
@@ -280,26 +283,29 @@ TEST_CASE ()
                     if (newfd == -1)
                     {
                         perror("accept");
-                        
                     }
+                    
                     else
                     {
-                        //                    add_to_pfds(&pfds, newfd, &pfds, &fd_size);
-                        //                    pfds.emplace_back (newfd, POLLIN);
                         pfds.push_back (pollfd {newfd, POLLIN});
-                        printf("pollserver: new connection from %s on "
-                               "socket %d\n",
-                               inet_ntop(remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN),
-                               newfd);
+                        printf ("pollserver: new connection from %s on socket %d\n", inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN), newfd);
                     }
+                    
                     auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-                    write (newfd, msg, strlen (msg));
+                    int len = strlen (msg);
+                
+                    if (sendall (newfd, (char*)msg, &len) == -1)
+                    {
+                        perror("sendall");
+                        printf("We only sent %d bytes because of the error!\n", len);
+                    }
                 }
                 else
                 {
                     // If not the listener, we're just a regular client
                     int nbytes = recv (pfds[i].fd, buf, sizeof buf, 0);
                     int sender_fd = pfds[i].fd;
+                    
                     if (nbytes <= 0)
                     {
                         if (nbytes == 0)
@@ -312,34 +318,42 @@ TEST_CASE ()
                         {
                             perror ("recv");
                         }
-                        
-                        //                        send (<#int#>, <#const void *#>, <#size_t#>, <#int#>)
-                        
-                        close (pfds[i].fd); // Bye!
-                        pfds.erase(pfds.begin() + i);
-                        //                del_from_pfds(pfds, i, &fd_count);
+                                                
+                        close (pfds[i].fd);
+                        pfds.erase (pfds.begin() + i);
                         
                     } else
                     {
-                        // We got some good data from a client
-                        for(int j = 0; j < pfds.size(); j++)
-                        { // Send to everyone!
-                            int dest_fd = pfds[j].fd;
-                            // Except the listener and ourselves
-                            if (dest_fd != listener && dest_fd != sender_fd)
-                            {
-                                
-                                auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-                                cout << msg << endl;
-                                //                                if (send (dest_fd, msg, strlen (msg), 0) == -1)
-                                //                                {
-                                //                                    perror("send");
-                                //
-                                //                                }
-                                write (dest_fd, msg, strlen (msg));
-                            }
-                            
+                        
+                        auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+    //                    write (newfd, msg, strlen (msg));
+                        int len = strlen (msg);
+                        
+                        if (sendall (newfd, (char*)msg, &len) == -1)
+                        {
+                            perror("sendall");
+                            printf("We only sent %d bytes because of the error!\n", len);
                         }
+                        
+//                        // We got some good data from a client
+//                        for(int j = 0; j < pfds.size(); j++)
+//                        { // Send to everyone!
+//                            int dest_fd = pfds[j].fd;
+//                            // Except the listener and ourselves
+//                            if (dest_fd != listener && dest_fd != sender_fd)
+//                            {
+//
+//                                auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+//                                cout << msg << endl;
+//                                //                                if (send (dest_fd, msg, strlen (msg), 0) == -1)
+//                                //                                {
+//                                //                                    perror("send");
+//                                //
+//                                //                                }
+//                                write (dest_fd, msg, strlen (msg));
+//                            }
+//
+//                        }
                     }
                 } // END handle data from client
             } // END got ready-to-read from poll() } // END looping through file descriptors
