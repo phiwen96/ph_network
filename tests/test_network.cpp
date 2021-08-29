@@ -15,6 +15,11 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
+#include <openssl/applink.c>
+#include <openssl/bio.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
 
 using std::cout, std::endl;
 
@@ -243,10 +248,32 @@ SCENARIO ("send raw IP packets (no matter if IPv4 or IPv6), using a raw IP socke
                 cout << buffer << endl;
 //                printf ("%s\n", buffer);
 //                write(new_socket , hello , strlen(hello));
+                auto msg =
+                    "<!DOCTYPE html>"
+                    "<html>"
+                    "<body>"
+                    "<h1>This is heading 1</h1>"
+                    "<h2>This is heading 2</h2>"
+                    "<h3>This is heading 3</h3>"
+                    "<h4>This is heading 4</h4>"
+                    "<h5>This is heading 5</h5>"
+                    "<h6>This is heading 6</h6>"
+                    "</body>"
+                "</html>";
+//                auto response = std::string {"HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!"};
+                auto response = std::string {"HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: "} + std::to_string(strlen (msg)) + std::string {"\n\n"} + msg;
+
+//                auto response = std::string {"POST /token HTTP/1.1"
+//            "Host: oauth2.googleapis.com"
+//            "Content-Type: application/x-www-form-urlencoded"
+//
+//            "code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7&"
+//            "client_id=your_client_id&"
+//            "client_secret=your_client_secret&"
+//            "redirect_uri=https%3A//oauth2.example.com/code&"
+//                "grant_type=authorization_code"};
                 
-                auto response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-                
-                if (send (connected_sock, response, strlen (response), 0) == -1)
+                if (send (connected_sock, response.c_str(), response.size(), 0) == -1)
                 {
                     perror("send");
                 }

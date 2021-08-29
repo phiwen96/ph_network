@@ -33,10 +33,21 @@ if (NOT TARGET ph_cmake)
 endif ()
 
 
+set(GLFW_BUILD_EXAMPLES OFF)
+set(GLFW_BUILD_TESTS OFF)
+set(GLFW_BUILD_DOCS OFF)
+
+Fetch (TARGETS "glfw" REPO "glfw" TAG "3.3.4" )
 
 
 
 Fetch (TARGETS ph_data_structures ph_concepts const_str)
+
+# find_package (OpenSSL REQUIRED)
+
+find_package(Vulkan REQUIRED)
+
+
 
 # if (NOT TARGET ctre)
 # 	include (FetchContent)

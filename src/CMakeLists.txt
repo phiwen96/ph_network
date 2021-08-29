@@ -23,15 +23,15 @@ target_compile_features (${self} PUBLIC cxx_std_20)
 # ph_precompile (TARGET ph_concepts PRIVATE PCH ${std_pch} ${boost_pch})
 
 # add_library (ph::network ALIAS ph_network)
-target_link_libraries (ph_network PUBLIC ${Boost_LIBRARIES} const_str ph_concepts ph_data_structures)
-target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS} const_str ph_concepts ph_data_structures ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries (ph_network PUBLIC  ${Vulkan_LIBRARIES} glfw ${Boost_LIBRARIES} const_str ph_concepts ph_data_structures)
+target_include_directories (ph_network PUBLIC ${Vulkan_INCLUDE_DIR} glfw ${Boost_INCLUDE_DIRS} const_str ph_concepts ph_data_structures ${PROJECT_SOURCE_DIR}/include)
 # target_include_directories (ph_network PUBLIC ${Boost_INCLUDE_DIRS})
 #  OpenSSL::SSL
 target_compile_features (ph_network PUBLIC cxx_std_20)
 
 # target_compile_options(ph_network PUBLIC "-ast-dump  -fsyntax-only")
-
-
+# echo 'export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"' >> ~/.zshrc
+# echo 'export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"' >> ~/.zshrc
 target_include_directories(ph_network PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/ph_network>
     $<INSTALL_INTERFACE:include/ph_network>
