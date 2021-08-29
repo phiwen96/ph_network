@@ -43,19 +43,19 @@ namespace ph::network
     
     
     
-    template <typename...>
-    struct socket;
-    
-    template <>
-    struct socket <types>
-    {
-        
-        
-        constexpr auto begin () noexcept
-        {
-//            return
-        }
-    };
+//    template <typename...>
+//    struct socket;
+//
+//    template <>
+//    struct socket <types>
+//    {
+//
+//
+//        constexpr auto begin () noexcept
+//        {
+////            return
+//        }
+//    };
     
     
     
@@ -67,6 +67,12 @@ namespace ph::network
     
     template <typename T>
     concept Port = std::is_convertible_v <T, unsigned short>;
+    
+    template <typename T>
+    concept Server = requires ()
+    {
+        true;
+    };
 }
 
 
