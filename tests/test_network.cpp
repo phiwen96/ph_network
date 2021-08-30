@@ -14,7 +14,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <vulkan/vulkan.h>
+//#include <vulkan/vulkan.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -421,5 +421,7 @@ TEST_CASE ()
         
         
     };
+    
+    s ();
 }
 
