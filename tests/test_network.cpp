@@ -139,7 +139,7 @@ void *get_in_addr(struct sockaddr * sa)
 }
 
 
-int get_listener_socket (void)
+int get_listener_socket (char const* port)
 {
     
     int listener; // Listening socket descriptor
@@ -152,7 +152,7 @@ int get_listener_socket (void)
     // Get us a socket and bind it
     int rv;
     
-    if ((rv = getaddrinfo(NULL, PORT, &hints, &ai)) != 0)
+    if ((rv = getaddrinfo(NULL, port, &hints, &ai)) != 0)
     {
         fprintf(stderr, "selectserver: %s\n", gai_strerror(rv));
         exit(1);
@@ -163,12 +163,20 @@ int get_listener_socket (void)
     {
         listener = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
         
+        
+        
         if (listener < 0)
         {
             continue;
         }
         
-        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+//        sockfd = socket(AF_INET, SOCK_DGRAM, 0)
+      
+            // this call is what allows broadcast packets to be sent:
+        setsockopt(listener, SOL_SOCKET, SO_BROADCAST, &yes, sizeof (yes));
+        
+        
+//        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
         
         if (bind(listener, p->ai_addr, p->ai_addrlen) < 0)
         {
@@ -229,24 +237,39 @@ int sendall (int s, char* buf, int *len)
     *len = total; // return number actually sent here
     return n==-1?-1:0; // return -1 on failure, 0 on success }
 }
-TEST_CASE ()
+
+//template <auto port, auto on_connection>
+struct server
 {
+//    char const* port;
+//    decltype (a) on_new_connection;
+//    void* on_connection;
+    
+
     // Listening socket descriptor
     int listener;
-    int newfd;
+    int connection_sock;
     struct sockaddr_storage remoteaddr; // Client address socklen_t addrlen;
     
+auto operator() ()
+{
+    /**
+     monitor a bunch of sockets at once and then handle the ones that have data ready.
+     */
     
-    char buf[256]; // Buffer for client data
-    char remoteIP[INET6_ADDRSTRLEN];
+    
+    
+    
+    char buf [256]; // Buffer for client data
+    char remoteIP [INET6_ADDRSTRLEN];
     socklen_t addrlen;
     // Start off with room for 5 connections // (We'll realloc as necessary)
     //    int fd_count = 0;
     //    int fd_size = 5;
     //    struct pollfd *pfds = (pollfd*) malloc(sizeof *pfds * fd_size); // Set up and get a listening socket
-    auto pfds = std::vector <pollfd> {};
+    auto pfds = std::vector <pollfd> (10);
     
-    listener = get_listener_socket();
+    listener = get_listener_socket (port);
     
     if (listener == -1)
     {
@@ -260,8 +283,9 @@ TEST_CASE ()
     // Main loop
     for(;;)
     {
-        int poll_count = poll (pfds.data(), pfds.size(), -1);
-        
+        cout << "0" << endl;
+        int poll_count = poll (pfds.data(), pfds.size(), 1000);
+        cout << "1" << endl;
         if (poll_count == -1)
         {
             perror("poll");
@@ -278,27 +302,42 @@ TEST_CASE ()
                 {
                     // If listener is ready to read, handle new connection
                     addrlen = sizeof remoteaddr;
-                    newfd = accept (listener,(struct sockaddr *)&remoteaddr, &addrlen);
+                    connection_sock = accept (listener,(struct sockaddr *)&remoteaddr, &addrlen);
                     
-                    if (newfd == -1)
+                    if (connection_sock == -1)
                     {
                         perror("accept");
                     }
                     
                     else
                     {
-                        pfds.push_back (pollfd {newfd, POLLIN});
-                        printf ("pollserver: new connection from %s on socket %d\n", inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN), newfd);
+                        pfds.push_back (pollfd {connection_sock, POLLIN});
+//                        on_new_connection ()
+                        printf ("pollserver: new connection from %s on socket %d\n", inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN), connection_sock);
                     }
                     
                     auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
                     int len = strlen (msg);
                 
-                    if (sendall (newfd, (char*)msg, &len) == -1)
-                    {
-                        perror("sendall");
-                        printf("We only sent %d bytes because of the error!\n", len);
-                    }
+                    [&](){
+                        if (sendall (connection_sock, (char*)msg, &len) == -1)
+                        {
+                            perror("sendall");
+                            printf("We only sent %d bytes because of the error!\n", len);
+                        }
+                    };
+                    
+                    [&](){
+                        int numbytes;
+                        
+                        if ((numbytes = sendto (connection_sock, msg, strlen (msg), 0, (struct sockaddr *)&remoteaddr, sizeof remoteaddr)) == -1)
+                        {
+                                perror("sendto");
+                        exit(1);
+                        }
+                            
+                    }();
+                    
                 }
                 else
                 {
@@ -326,10 +365,10 @@ TEST_CASE ()
                     {
                         
                         auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-    //                    write (newfd, msg, strlen (msg));
+    //                    write (connection_sock, msg, strlen (msg));
                         int len = strlen (msg);
                         
-                        if (sendall (newfd, (char*)msg, &len) == -1)
+                        if (sendall (connection_sock, (char*)msg, &len) == -1)
                         {
                             perror("sendall");
                             printf("We only sent %d bytes because of the error!\n", len);
@@ -360,3 +399,27 @@ TEST_CASE ()
         } // END for(;;)--and you thought it would never end! return 0;
     }
 }
+    char const* port;
+    void (*on_new_connection)(int);
+};
+
+
+//template <typename T, typename U>
+//server (T port, U on_connection) -> server <port, on_connection>;
+TEST_CASE ()
+{
+//    void (*foo)(int);
+    auto a = [](){};
+    auto s = server
+    {
+        .port = "8080",
+        .on_new_connection = [](int socket)
+        {
+            
+        }
+        
+        
+        
+    };
+}
+

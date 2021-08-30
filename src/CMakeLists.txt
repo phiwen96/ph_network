@@ -29,6 +29,19 @@ target_include_directories (ph_network PUBLIC ${Vulkan_INCLUDE_DIR} glfw ${Boost
 #  OpenSSL::SSL
 target_compile_features (ph_network PUBLIC cxx_std_20)
 
+option(JS_ONLY "Compiles to native JS (No WASM)" OFF)
+
+
+if(JS_ONLY)
+	message(STATUS "Setting compilation target to native JavaScript")
+	set(CMAKE_EXECUTABLE_SUFFIX ".js")
+	set_target_properties(ph_network PROPERTIES LINK_FLAGS "-s WASM=0 -s EXPORTED_FUNCTIONS='[_main]'")
+else(JS_ONLY)
+	message(STATUS "Setting compilation target to WASM")
+	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
+	set_target_properties(ph_network PROPERTIES LINK_FLAGS "-s WASM=1 -s EXPORTED_FUNCTIONS='[_main]'")
+endif(JS_ONLY)
+
 # target_compile_options(ph_network PUBLIC "-ast-dump  -fsyntax-only")
 # echo 'export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"' >> ~/.zshrc
 # echo 'export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"' >> ~/.zshrc
