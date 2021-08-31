@@ -163,20 +163,20 @@ int get_listener_socket (char const* port)
     {
         listener = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
         
-        
+        fcntl (listener, F_SETFL, O_NONBLOCK);
         
         if (listener < 0)
         {
             continue;
         }
         
-//        sockfd = socket(AF_INET, SOCK_DGRAM, 0)
-      
-            // this call is what allows broadcast packets to be sent:
+        //        sockfd = socket(AF_INET, SOCK_DGRAM, 0)
+        
+        // this call is what allows broadcast packets to be sent:
         setsockopt(listener, SOL_SOCKET, SO_BROADCAST, &yes, sizeof (yes));
         
         
-//        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+        //        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
         
         if (bind(listener, p->ai_addr, p->ai_addrlen) < 0)
         {
@@ -241,187 +241,223 @@ int sendall (int s, char* buf, int *len)
 //template <auto port, auto on_connection>
 struct server
 {
-//    char const* port;
-//    decltype (a) on_new_connection;
-//    void* on_connection;
     
-
-    // Listening socket descriptor
     int listener;
     int connection_sock;
     struct sockaddr_storage remoteaddr; // Client address socklen_t addrlen;
     
-auto operator() ()
-{
-    /**
-     monitor a bunch of sockets at once and then handle the ones that have data ready.
-     */
-    
-    
-    
-    
-    char buf [256]; // Buffer for client data
-    char remoteIP [INET6_ADDRSTRLEN];
-    socklen_t addrlen;
-    // Start off with room for 5 connections // (We'll realloc as necessary)
-    //    int fd_count = 0;
-    //    int fd_size = 5;
-    //    struct pollfd *pfds = (pollfd*) malloc(sizeof *pfds * fd_size); // Set up and get a listening socket
-    auto pfds = std::vector <pollfd> (10);
-    
-    listener = get_listener_socket (port);
-    
-    if (listener == -1)
+    auto operator() ()
     {
-        fprintf(stderr, "error getting listening socket\n"); exit(1);
-    }
-    // Add the listener to set
-    pfds.push_back (pollfd {listener, POLLIN});
-    //    pfds[0].fd = listener;
-    //    pfds[0].events = POLLIN; // Report ready to read on incoming connection
-    //    fd_count = 1; // For the listener
-    // Main loop
-    for(;;)
-    {
-        cout << "0" << endl;
-        int poll_count = poll (pfds.data(), pfds.size(), 1000);
-        cout << "1" << endl;
-        if (poll_count == -1)
+        /**
+         monitor a bunch of sockets at once and then handle the ones that have data ready.
+         */
+        
+        char buf [256]; // Buffer for client data
+        char remoteIP [INET6_ADDRSTRLEN];
+        socklen_t addrlen;
+        
+        
+        auto connections = std::vector <pollfd> (10);
+        
+        listener = get_listener_socket (port);
+        
+        if (listener == -1)
         {
-            perror("poll");
-            exit(1);
+            fprintf(stderr, "error getting listening socket\n"); exit(1);
             
         }
-        // Run through the existing connections looking for data to read
-        for(int i = 0; i < pfds.size(); i++)
+        // Add the listener to set
+        connections.push_back (pollfd {listener, POLLIN});
+        
+        for(;;)
         {
-            // Check if someone's ready to read
-            if (pfds[i].revents & POLLIN)
-            { // We got one!!
-                if (pfds[i].fd == listener)
+            //        cout << "0" << endl;
+            int poll_count = poll (connections.data(), connections.size(), -1);
+            //        cout << "1" << endl;
+            if (poll_count == -1)
+            {
+                perror("poll");
+                exit(1);
+            }
+            // Run through the existing connections looking for data to read
+            auto i = 0;
+            
+            for (auto connection : connections)
+            {
+                // Check if someone's ready to read
+                if (connection.revents & POLLIN)
                 {
-                    // If listener is ready to read, handle new connection
-                    addrlen = sizeof remoteaddr;
-                    connection_sock = accept (listener,(struct sockaddr *)&remoteaddr, &addrlen);
-                    
-                    if (connection_sock == -1)
+                    if (connection.fd == listener)
                     {
-                        perror("accept");
-                    }
-                    
-                    else
-                    {
-                        pfds.push_back (pollfd {connection_sock, POLLIN});
-//                        on_new_connection ()
-                        printf ("pollserver: new connection from %s on socket %d\n", inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN), connection_sock);
-                    }
-                    
-                    auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-                    int len = strlen (msg);
-                
-                    [&](){
-                        if (sendall (connection_sock, (char*)msg, &len) == -1)
-                        {
-                            perror("sendall");
-                            printf("We only sent %d bytes because of the error!\n", len);
-                        }
-                    };
-                    
-                    [&](){
-                        int numbytes;
+                        // If listener is ready to read, handle new connection
+                        addrlen = sizeof remoteaddr;
+                        connection_sock = accept (listener,(struct sockaddr *)&remoteaddr, &addrlen);
                         
-                        if ((numbytes = sendto (connection_sock, msg, strlen (msg), 0, (struct sockaddr *)&remoteaddr, sizeof remoteaddr)) == -1)
+                        if (connection_sock == -1)
                         {
-                                perror("sendto");
-                        exit(1);
+                            perror("accept");
                         }
-                            
-                    }();
-                    
-                }
-                else
-                {
-                    // If not the listener, we're just a regular client
-                    int nbytes = recv (pfds[i].fd, buf, sizeof buf, 0);
-                    int sender_fd = pfds[i].fd;
-                    
-                    if (nbytes <= 0)
-                    {
-                        if (nbytes == 0)
-                        {
-                            // Got error or connection closed by client if (nbytes == 0) {
-                            // Connection closed
-                            printf ("pollserver: socket %d hung up\n", sender_fd);
-                        }
+                        
                         else
                         {
-                            perror ("recv");
+                            connections.push_back (pollfd {connection_sock, POLLIN});
+                            auto connection_address = inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
+                            on_new_connection (connection_sock, connection_address);
+                            printf ("pollserver: new connection from %s on socket %d\n", connection_address, connection_sock);
                         }
-                                                
-                        close (pfds[i].fd);
-                        pfds.erase (pfds.begin() + i);
-                        
-                    } else
-                    {
                         
                         auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-    //                    write (connection_sock, msg, strlen (msg));
                         int len = strlen (msg);
                         
-                        if (sendall (connection_sock, (char*)msg, &len) == -1)
-                        {
-                            perror("sendall");
-                            printf("We only sent %d bytes because of the error!\n", len);
-                        }
+                        [&](){
+                            if (sendall (connection_sock, (char*)msg, &len) == -1)
+                            {
+                                perror("sendall");
+                                printf("We only sent %d bytes because of the error!\n", len);
+                            }
+                        };
                         
-//                        // We got some good data from a client
-//                        for(int j = 0; j < pfds.size(); j++)
-//                        { // Send to everyone!
-//                            int dest_fd = pfds[j].fd;
-//                            // Except the listener and ourselves
-//                            if (dest_fd != listener && dest_fd != sender_fd)
-//                            {
-//
-//                                auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-//                                cout << msg << endl;
-//                                //                                if (send (dest_fd, msg, strlen (msg), 0) == -1)
-//                                //                                {
-//                                //                                    perror("send");
-//                                //
-//                                //                                }
-//                                write (dest_fd, msg, strlen (msg));
-//                            }
-//
-//                        }
+                        [&](){
+                            int numbytes;
+                            
+                            if ((numbytes = sendto (connection_sock, msg, strlen (msg), 0, (struct sockaddr *)&remoteaddr, sizeof remoteaddr)) == -1)
+                            {
+                                perror("sendto");
+                                exit(1);
+                            }
+                            
+                        }();
+                        
                     }
-                } // END handle data from client
-            } // END got ready-to-read from poll() } // END looping through file descriptors
-        } // END for(;;)--and you thought it would never end! return 0;
+                    else
+                    {
+                        // If not the listener, we're just a regular client
+                        int nbytes = recv (connection.fd, buf, sizeof buf, 0);
+                        int sender_fd = connection.fd;
+                        
+                        if (nbytes <= 0)
+                        {
+                            if (nbytes == 0)
+                            {
+                                // Got error or connection closed by client if (nbytes == 0) {
+                                // Connection closed
+                                printf ("pollserver: socket %d hung up\n", sender_fd);
+                                auto connection_address = inet_ntop (remoteaddr.ss_family, get_in_addr((struct sockaddr*)&remoteaddr), remoteIP, INET6_ADDRSTRLEN);
+                                on_connection_closed (sender_fd, connection_address);
+                            }
+                            else
+                            {
+                                perror ("recv");
+                            }
+                            
+                            close (connection.fd);
+                            connections.erase (connections.begin() + i);
+                            
+                        } else
+                        {
+                            
+                            auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+                            //                    write (connection_sock, msg, strlen (msg));
+                            int len = strlen (msg);
+                            
+                            if (sendall (connection_sock, (char*)msg, &len) == -1)
+                            {
+                                perror("sendall");
+                                printf("We only sent %d bytes because of the error!\n", len);
+                            }
+                            
+                            //                        // We got some good data from a client
+                            //                        for(int j = 0; j < connections.size(); j++)
+                            //                        { // Send to everyone!
+                            //                            int dest_fd = connections[j].fd;
+                            //                            // Except the listener and ourselves
+                            //                            if (dest_fd != listener && dest_fd != sender_fd)
+                            //                            {
+                            //
+                            //                                auto msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+                            //                                cout << msg << endl;
+                            //                                //                                if (send (dest_fd, msg, strlen (msg), 0) == -1)
+                            //                                //                                {
+                            //                                //                                    perror("send");
+                            //                                //
+                            //                                //                                }
+                            //                                write (dest_fd, msg, strlen (msg));
+                            //                            }
+                            //
+                            //                        }
+                        }
+                    } // END handle data from client
+                } // END got ready-to-read from poll() } // END looping through file descriptors
+            } // END for(;;)--and you thought it would never end! return 0;
+            
+            ++i;
+        }
     }
-}
     char const* port;
-    void (*on_new_connection)(int);
+    void (*on_new_connection)(int, char const*);
+    void (*on_connection_closed)(int, char const*);
 };
 
 
 //template <typename T, typename U>
 //server (T port, U on_connection) -> server <port, on_connection>;
-TEST_CASE ()
+
+void sigint_handler (int sig)
 {
-//    void (*foo)(int);
-    auto a = [](){};
-    auto s = server
+    write(0, "^c", 2);
+}
+
+/**
+ fopen(), fclose(), fwrite()
+    implemented using
+ open(), creat(), close(), and write()
+ */
+TEST_CASE ("SIGINT")
+{
+    
+    
+    struct sigaction sa
     {
-        .port = "8080",
-        .on_new_connection = [](int socket)
-        {
-            
-        }
-        
-        
-        
+        .sa_handler = sigint_handler,
+        .sa_flags = 0
     };
     
-    s ();
+    sigemptyset (&sa.sa_mask);
+    
+    if (sigaction (SIGINT, &sa, NULL) == -1)
+    {
+        perror("sigaction");
+        exit(1);
+    }
+}
+
+TEST_CASE ()
+{
+    
+    signal (SIGCHLD, SIG_IGN);  /* now I don't have to wait()! */
+    
+    
+    
+    cout << "hi" << endl;
+    
+    
+    //    ph::process::root();
+    
+    
+    //    void (*foo)(int);
+    server
+    {
+        .port = "8080",
+        .on_new_connection = [](auto connection_sock, auto connection_address)
+        {
+            cout << "new connection from " << connection_address << endl;
+        },
+        .on_connection_closed = [] (auto connection_sock, auto connection_address)
+        {
+            cout << "closed connection from " << connection_address << endl;
+        }
+    };
+    
+    
 }
 

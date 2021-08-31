@@ -5,6 +5,9 @@
 #include <ph_concepts/concepts.hpp>
 #include <latch>
 #include <poll.h>
+#include <unistd.h>
+
+using std::cout, std::endl;
 
 using namespace ph::concepts;
 
@@ -12,6 +15,12 @@ using namespace ph::concepts;
 
 namespace ph::network
 {
+    template <typename T>
+    auto operator+= (std::vector <T>& v, auto&& e)
+    {
+        v.push_back (std::forward <decltype (e)> (e));
+        return v;
+    }
     
     struct types {};
     
@@ -153,3 +162,24 @@ long double unpack754(uint64_t i, unsigned bits, unsigned expbits)
 #define pack754_64(f) (pack754((f), 64, 11))
 #define unpack754_32(i) (unpack754((i), 32, 8))
 #define unpack754_64(i) (unpack754((i), 64, 11))
+
+
+
+namespace ph::process
+{
+    auto id () -> pid_t
+    {
+        return getpid ();
+    }
+    
+    auto parent_id () -> pid_t
+    {
+        return getppid ();
+    }
+    
+    auto fork () -> pid_t
+    {
+        return fork ();
+    }
+}
+
