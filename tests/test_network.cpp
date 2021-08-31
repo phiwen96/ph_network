@@ -28,6 +28,9 @@
 #include <poll.h>
 #include <vector>
 
+#include <sys/msg.h>
+
+
 #define PORT "80"
 //#include <openssl/applink.c>
 //#include <openssl/bio.h>
@@ -407,6 +410,55 @@ void sigint_handler (int sig)
     write(0, "^c", 2);
 }
 
+struct cheese_msgbuf
+{
+    long mtype;
+    char name[20];
+};
+
+
+
+TEST_CASE ("message queue")
+{
+    
+//    auto key = ftok ("/home/beej/somefile", 'b'); // create key
+//    auto msqid = msgget (key, 0666 | IPC_CREAT); // connect to the message queue
+    
+    auto c = cheese_msgbuf
+    {
+        .mtype = 2,
+        .name = "kiss"
+    };
+    
+    auto msg_queue = ph::msg_queue
+    {
+        "foo/bar"
+    };
+    
+    msg_queue.send (c);
+    
+    auto cc = cheese_msgbuf
+    {
+        .mtype = 2,
+        .name = "kuk"
+    };
+    
+    msg_queue.receive (cc);
+    cout << cc.name << endl;
+    
+//    msgsnd (msqid, &c, sizeof (struct cheese_msgbuf), 0);
+    
+//    auto cc = cheese_msgbuf {};
+    
+//    msgrcv (msqid, &cc, sizeof (struct cheese_msgbuf), 2, 0);
+//    cout << cc.name << endl;
+}
+
+TEST_CASE ("shared memory")
+{
+    auto sm = ph::shared_memory <std::string> {"foo/bar", 1024};
+}
+
 /**
  fopen(), fclose(), fwrite()
     implemented using
@@ -436,13 +488,14 @@ TEST_CASE ()
     
     signal (SIGCHLD, SIG_IGN);  /* now I don't have to wait()! */
     
-    
+    int pfds[2];
+    pipe (pfds);
+//    close (1);
     
     cout << "hi" << endl;
     
     
     //    ph::process::root();
-    
     
     //    void (*foo)(int);
     server

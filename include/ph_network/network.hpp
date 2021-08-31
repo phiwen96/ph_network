@@ -6,6 +6,7 @@
 #include <latch>
 #include <poll.h>
 #include <unistd.h>
+#include <sys/shm.h>
 
 using std::cout, std::endl;
 
@@ -183,3 +184,69 @@ namespace ph::process
     }
 }
 
+#include <sys/msg.h>
+namespace ph
+{
+    struct msg_queue
+    {
+        key_t key;
+        int queue_id;
+        
+        msg_queue (auto path) : key {ftok (path, 'b')}, queue_id {msgget (key, 0666 | IPC_CREAT)}
+        {
+            
+        }
+        
+        ~msg_queue ()
+        {
+            msgctl (queue_id, IPC_RMID, NULL);
+        }
+        
+        auto send (auto value)
+        requires requires
+        {
+            std::is_same_v <decltype (value.mtype), long>;
+        }
+        {
+            msgsnd (queue_id, &value, sizeof (decltype (value)), 0);
+        }
+        
+        auto receive (auto& value)
+        requires requires
+        {
+            std::is_same_v <decltype (value.mtype), long>;
+        }
+        {
+            msgrcv (queue_id, &value, sizeof (decltype (value)), 2, 0);
+        }
+    };
+    auto create_key (auto path)
+    {
+        return ftok (path, 'b');
+    }
+    
+    auto create_id ()
+    {
+        
+//        return msgget (key, 0666 | IPC_CREAT);
+    }
+    
+}
+
+
+namespace ph
+{
+    template <typename T>
+    struct shared_memory
+    {
+        key_t key;
+        int id;
+        T* data;
+        
+        shared_memory (auto path, auto bytes) : key {ftok (path, 'R')}, id {shmget (key, bytes, 0644 | IPC_CREAT)}, data {static_cast <T*> (shmat (id, (void *)0, 0))}
+        {
+            
+             
+        }
+    };
+}
